@@ -7,8 +7,6 @@ import CategorySelector from '@/components/CategorySelector';
 import { db, addExpense, updateExpense, getBudget, getExpensesByMonth } from '@/lib/db';
 import { CURRENCIES, Expense } from '@/lib/types';
 import { sendBudgetNotification, requestNotificationPermission } from '@/lib/notifications';
-import { OcrResult } from '@/lib/ocr';
-
 function AddExpenseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -26,10 +24,6 @@ function AddExpenseContent() {
   const [photoDataUrl, setPhotoDataUrl] = useState<string | undefined>(undefined);
   const [receiptText, setReceiptText] = useState('');
 
-  const [ocrLoading, setOcrLoading] = useState(false);
-  const [ocrProgress, setOcrProgress] = useState(0);
-  const [ocrResult, setOcrResult] = useState<OcrResult | null>(null);
-  const [showOcrPanel, setShowOcrPanel] = useState(false);
 
   const [saving, setSaving] = useState(false);
   const [loadingEdit, setLoadingEdit] = useState(!!editId);
@@ -52,34 +46,12 @@ function AddExpenseContent() {
     });
   }, [editId]);
 
-  async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Convert to base64
     const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const dataUrl = ev.target?.result as string;
-      setPhotoDataUrl(dataUrl);
-      setOcrLoading(true);
-      setOcrProgress(0);
-      setShowOcrPanel(true);
-      try {
-        const { recognizeText } = await import('@/lib/ocr');
-        const result = await recognizeText(dataUrl, (p) => setOcrProgress(p));
-        setOcrResult(result);
-        if (result.suggestedAmount !== null) {
-          setAmount(result.suggestedAmount.toFixed(2));
-        }
-        if (result.suggestedDescription && !description) {
-          setDescription(result.suggestedDescription);
-        }
-        setReceiptText(result.fullText);
-      } catch (err) {
-        console.error('OCR error:', err);
-      } finally {
-        setOcrLoading(false);
-      }
+    reader.onload = (ev) => {
+      setPhotoDataUrl(ev.target?.result as string);
     };
     reader.readAsDataURL(file);
   }
@@ -265,11 +237,7 @@ function AddExpenseContent() {
             />
             <button
               type="button"
-              onClick={() => {
-                setPhotoDataUrl(undefined);
-                setOcrResult(null);
-                setShowOcrPanel(false);
-              }}
+              onClick={() => setPhotoDataUrl(undefined)}
               className="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm"
             >
               ×
@@ -294,60 +262,6 @@ function AddExpenseContent() {
           {photoDataUrl ? 'Changer la photo' : 'Prendre / choisir une photo'}
         </button>
 
-        {/* OCR Progress */}
-        {ocrLoading && showOcrPanel && (
-          <div className="mt-3 p-3 bg-blue-50 rounded-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-              <span className="text-sm text-blue-700 font-medium">
-                Analyse du reçu... {ocrProgress}%
-              </span>
-            </div>
-            <div className="w-full bg-blue-100 rounded-full h-2">
-              <div
-                className="h-2 bg-blue-500 rounded-full transition-all duration-300"
-                style={{ width: `${ocrProgress}%` }}
-              />
-            </div>
-          </div>
-        )}
-
-        {/* OCR Result */}
-        {!ocrLoading && ocrResult && showOcrPanel && (
-          <div className="mt-3 p-3 bg-green-50 rounded-xl">
-            <p className="text-xs font-medium text-green-700 mb-2">✅ Texte reconnu</p>
-            {ocrResult.suggestedAmount !== null && (
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs text-gray-500">Montant suggéré :</span>
-                <button
-                  type="button"
-                  onClick={() => setAmount(ocrResult.suggestedAmount!.toFixed(2))}
-                  className="text-sm font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-lg"
-                >
-                  {ocrResult.suggestedAmount.toFixed(2)}
-                </button>
-              </div>
-            )}
-            {ocrResult.suggestedDescription && (
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-xs text-gray-500">Description :</span>
-                <button
-                  type="button"
-                  onClick={() => setDescription(ocrResult.suggestedDescription)}
-                  className="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded-lg truncate max-w-[160px]"
-                >
-                  {ocrResult.suggestedDescription}
-                </button>
-              </div>
-            )}
-            <details className="mt-2">
-              <summary className="text-xs text-gray-400 cursor-pointer">Texte complet</summary>
-              <pre className="text-xs text-gray-500 mt-1 whitespace-pre-wrap max-h-24 overflow-y-auto">
-                {ocrResult.fullText}
-              </pre>
-            </details>
-          </div>
-        )}
       </div>
 
       {/* Save button */}
