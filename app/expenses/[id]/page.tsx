@@ -12,6 +12,10 @@ const paymentLabels: Record<string, string> = {
   other: '🔄 Autre',
 };
 
+export function generateStaticParams() {
+  return [];
+}
+
 export default function ExpenseDetailPage() {
   const router = useRouter();
   const params = useParams();
