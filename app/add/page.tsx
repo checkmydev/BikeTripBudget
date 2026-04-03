@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import CategorySelector from '@/components/CategorySelector';
@@ -9,7 +9,7 @@ import { CURRENCIES, Expense } from '@/lib/types';
 import { sendBudgetNotification, requestNotificationPermission } from '@/lib/notifications';
 import { OcrResult } from '@/lib/ocr';
 
-export default function AddExpensePage() {
+function AddExpenseContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const editId = searchParams.get('id');
@@ -367,5 +367,13 @@ export default function AddExpensePage() {
         )}
       </button>
     </div>
+  );
+}
+
+export default function AddExpensePage() {
+  return (
+    <Suspense>
+      <AddExpenseContent />
+    </Suspense>
   );
 }

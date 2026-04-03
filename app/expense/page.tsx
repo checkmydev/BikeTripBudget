@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { db, deleteExpense } from '@/lib/db';
 import { Expense, CATEGORIES } from '@/lib/types';
@@ -12,7 +12,7 @@ const paymentLabels: Record<string, string> = {
   other: '🔄 Autre',
 };
 
-export default function ExpenseDetailPage() {
+function ExpenseDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get('id') || '';
@@ -202,5 +202,14 @@ export default function ExpenseDetailPage() {
         </button>
       )}
     </div>
+  );
+}
+
+
+export default function ExpenseDetailPage() {
+  return (
+    <Suspense>
+      <ExpenseDetailContent />
+    </Suspense>
   );
 }
