@@ -1,0 +1,142 @@
+========================================
+EVE - APP DEPENSES VELO (PWA)
+Etat du projet - 03 avril 2026
+========================================
+
+CHOIX TECHNIQUE
+---------------
+- PWA (Progressive Web App) avec Next.js 14 + TypeScript
+- Installable sur iPhone ET Android depuis le navigateur (Chrome/Safari)
+- 100% hors ligne apres premier chargement (Service Worker)
+- Stockage local : IndexedDB via Dexie.js
+- OCR : Tesseract.js (tourne dans le navigateur, gratuit, pas de backend)
+- Graphiques : Recharts
+- Style : Tailwind CSS
+- Pas de serveur, pas de base de donnees distante, tout en local
+
+
+FICHIERS CREES (25 fichiers)
+-----------------------------
+Structure :
+  pwa/
+  ├── package.json               OK - toutes les dependances
+  ├── next.config.js             OK - export statique + PWA
+  ├── tailwind.config.js         OK
+  ├── postcss.config.js          OK
+  ├── tsconfig.json              OK
+  ├── .eslintrc.json             OK
+  │
+  ├── public/
+  │   └── manifest.json         OK - config PWA (nom, icones, couleur)
+  │   [MANQUE] icon-192.png      A GENERER
+  │   [MANQUE] icon-512.png      A GENERER
+  │
+  ├── app/
+  │   ├── globals.css            OK
+  │   ├── layout.tsx             OK - layout principal + nav bas
+  │   ├── page.tsx               OK - dashboard accueil
+  │   ├── add/page.tsx           OK - ajout/edition depense + OCR
+  │   ├── expenses/
+  │   │   ├── page.tsx           OK - liste depenses par mois
+  │   │   └── [id]/page.tsx      OK - detail depense
+  │   ├── budget/page.tsx        OK - gestion budgets mensuels
+  │   └── reports/page.tsx       OK - graphiques (camembert + histogramme)
+  │
+  ├── components/
+  │   ├── BottomNav.tsx          OK - navigation bas de page (4 onglets)
+  │   ├── BudgetProgressBar.tsx  OK - barre progression vert/orange/rouge
+  │   ├── CategorySelector.tsx   OK - selection categorie horizontale
+  │   └── ExpenseCard.tsx        OK - carte depense avec swipe delete
+  │
+  ├── lib/
+  │   ├── types.ts               OK - types + 7 categories + devises
+  │   ├── db.ts                  OK - IndexedDB (CRUD depenses + budgets)
+  │   ├── ocr.ts                 OK - OCR Tesseract.js + parsing montant
+  │   ├── notifications.ts       OK - notifications budget 80% et 100%
+  │   └── formatters.ts          OK - formatage montants et dates FR
+  │
+  └── scripts/
+      └── generate-icons.js      OK - script pour generer les icones PNG
+
+
+CE QUI RESTE A FAIRE
+---------------------
+
+1. GENERER LES ICONES (5 min)
+   Les icones PNG sont necessaires pour que la PWA soit installable.
+   Commande : node scripts/generate-icons.js
+   Cree : public/icon-192.png et public/icon-512.png
+
+2. INSTALLER LES DEPENDANCES (2 min)
+   Dans le dossier pwa/ :
+     npm install
+
+   Si erreur avec next-pwa :
+     npm install --legacy-peer-deps
+
+3. LANCER EN DEV (1 min)
+   npm run dev
+   Ouvrir : http://localhost:3000
+
+4. TESTER L'OCR
+   - Sur mobile : utiliser l'appareil photo pour prendre un ticket
+   - Sur desktop : uploader une photo de ticket
+   - Le modele Tesseract se telecharge au premier usage (~10MB)
+
+5. TESTER LES NOTIFICATIONS
+   - Definir un budget dans l'onglet Budget
+   - Ajouter des depenses jusqu'a 80% du budget
+   - Accepter les permissions de notification quand demande
+
+6. BUILD PRODUCTION (optionnel - pour heberger)
+   npm run build
+   Genere le dossier "out/" - fichiers statiques a deployer sur :
+   - GitHub Pages (gratuit)
+   - Netlify (gratuit)
+   - Vercel (gratuit)
+   - Ou serveur web personnel
+
+7. INSTALLER SUR TELEPHONE
+   Android (Chrome) :
+     Aller sur l'URL → menu ⋮ → "Installer l'application"
+
+   iPhone (Safari) :
+     Aller sur l'URL → bouton partager → "Sur l'ecran d'accueil"
+
+   Note : sur iPhone, les notifications ne fonctionnent que si
+   l'app est ajoutee a l'ecran d'accueil (PWA standalone mode).
+
+
+FONCTIONNALITES IMPLEMENTEES
+------------------------------
+[x] Ajout depense manuel (montant, categorie, date, description, moyen de paiement)
+[x] 7 categories avec emoji : Nourriture, Hebergement, Transport, Equipement, Sante, Loisirs, Autre
+[x] Devises : EUR, USD, GBP, CHF, JPY, CAD
+[x] Photo de ticket + OCR automatique (Tesseract.js)
+    - Priorite aux lignes contenant "TOTAL" ou "MONTANT"
+    - Sinon prend le montant le plus eleve trouve
+    - Pre-remplit le formulaire
+[x] Budget mensuel avec alerte a 80% et 100%
+[x] Notifications navigateur (Web Notifications API)
+[x] Liste depenses filtrable par mois, categorie, recherche texte
+[x] Groupement par jour dans la liste
+[x] Detail depense avec preview photo
+[x] Edition et suppression
+[x] Rapport : camembert par categorie
+[x] Rapport : histogramme 6 mois avec ligne budget de reference
+[x] Tableau recapitulatif par categorie
+[x] Navigation bas de page 4 onglets
+[x] PWA installable (manifest.json + service worker)
+[x] Fonctionne hors ligne apres premier chargement
+[x] Interface entierement en francais
+[x] Design mobile-first vert cyclisme (#2E7D32)
+
+
+COMMANDES RESUMEES
+-------------------
+cd "C:\Users\MGE\OneDrive - Agilos\Documents\Claude Code Projects\Eve\pwa"
+node scripts/generate-icons.js
+npm install
+npm run dev
+
+========================================
