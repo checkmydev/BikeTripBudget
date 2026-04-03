@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import ExpenseCard from '@/components/ExpenseCard';
 import BudgetProgressBar from '@/components/BudgetProgressBar';
 import {
-  db,
   getExpensesByMonth,
   getBudget,
   deleteExpense,
@@ -46,14 +45,7 @@ export default function HomePage() {
     }
     load();
 
-    // Subscribe to DB changes
-    const hook = () => setTimeout(load, 100);
-    db.expenses.hook('creating', hook);
-    db.expenses.hook('deleting', hook);
-    return () => {
-      db.expenses.hook('creating').unsubscribe(hook);
-      db.expenses.hook('deleting').unsubscribe(hook);
-    };
+    return () => {};
   }, [month, year]);
 
   const total = expenses.reduce((s, e) => s + e.amount, 0);

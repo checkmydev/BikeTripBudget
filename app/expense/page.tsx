@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { db, deleteExpense } from '@/lib/db';
+import { getExpenseById, deleteExpense } from '@/lib/db';
 import { Expense, CATEGORIES } from '@/lib/types';
 import { formatAmount, formatDateLong } from '@/lib/formatters';
 
@@ -24,7 +24,7 @@ function ExpenseDetailContent() {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    db.expenses.get(id).then((exp) => {
+    getExpenseById(id).then((exp) => {
       setExpense(exp || null);
       setLoading(false);
     });

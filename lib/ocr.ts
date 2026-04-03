@@ -6,11 +6,29 @@ export interface OcrResult {
   suggestedDescription: string;
 }
 
+async function resizeImage(dataUrl: string, maxWidth = 1200): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      if (img.width <= maxWidth) { resolve(dataUrl); return; }
+      const scale = maxWidth / img.width;
+      const canvas = document.createElement('canvas');
+      canvas.width = maxWidth;
+      canvas.height = Math.round(img.height * scale);
+      const ctx = canvas.getContext('2d')!;
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+    };
+    img.src = dataUrl;
+  });
+}
+
 export async function recognizeText(
   imageDataUrl: string,
   onProgress?: (p: number) => void
 ): Promise<OcrResult> {
-  const result = await Tesseract.recognize(imageDataUrl, 'fra+eng', {
+  const resized = await resizeImage(imageDataUrl);
+  const result = await Tesseract.recognize(resized, 'eng', {
     logger: (m) => {
       if (m.status === 'recognizing text' && onProgress) {
         onProgress(Math.round(m.progress * 100));

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import CategorySelector from '@/components/CategorySelector';
-import { db, addExpense, updateExpense, getBudget, getExpensesByMonth } from '@/lib/db';
+import { addExpense, updateExpense, getBudget, getExpensesByMonth, getExpenseById } from '@/lib/db';
 import { CURRENCIES, Expense } from '@/lib/types';
 import { sendBudgetNotification, requestNotificationPermission } from '@/lib/notifications';
 function AddExpenseContent() {
@@ -31,7 +31,7 @@ function AddExpenseContent() {
   // Load existing expense for edit
   useEffect(() => {
     if (!editId) return;
-    db.expenses.get(editId).then((exp) => {
+    getExpenseById(editId).then((exp) => {
       if (exp) {
         setAmount(String(exp.amount));
         setCurrency(exp.currency);
@@ -79,7 +79,7 @@ function AddExpenseContent() {
         photoDataUrl,
         receiptText: receiptText || undefined,
         paymentMethod,
-        createdAt: editId ? (await db.expenses.get(editId))?.createdAt || new Date().toISOString() : new Date().toISOString(),
+        createdAt: editId ? (await getExpenseById(editId))?.createdAt || new Date().toISOString() : new Date().toISOString(),
       };
 
       if (editId) {
