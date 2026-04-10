@@ -5,7 +5,9 @@ import BottomNav from '@/components/BottomNav';
 export const metadata: Metadata = {
   title: 'Eve - Dépenses Vélo',
   description: 'Suivi des dépenses pour voyage à vélo',
-  manifest: '/manifest.json',
+  manifest: process.env.NODE_ENV === 'production'
+    ? '/BikeTripBudget/manifest.json'
+    : '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
