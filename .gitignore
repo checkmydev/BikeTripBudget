@@ -3,3 +3,9 @@ node_modules/
 out/
 .env*
 *.log
+# PWA generated service worker files
+public/sw.js
+public/workbox-*.js
+public/worker-*.js
+public/sw.js.map
+public/workbox-*.js.map

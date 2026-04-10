@@ -11,6 +11,6 @@ module.exports = withPWA({
   output: 'export',
   trailingSlash: true,
   images: { unoptimized: true },
-  basePath: isProd ? '/BikeTrip' : '',
-  assetPrefix: isProd ? '/BikeTrip/' : '',
+  basePath: isProd ? '/BikeTripBudget' : '',
+  assetPrefix: isProd ? '/BikeTripBudget/' : '',
 });
