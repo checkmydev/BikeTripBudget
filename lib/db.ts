@@ -66,7 +66,8 @@ export async function deleteExpense(id: string) {
 
 export async function getExpensesByMonth(year: number, month: number): Promise<Expense[]> {
   const start = `${year}-${String(month).padStart(2, '0')}-01`;
-  const end = `${year}-${String(month).padStart(2, '0')}-31`;
+  const lastDay = new Date(year, month, 0).getDate(); // day 0 of next month = last day of current month
+  const end = `${year}-${String(month).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`;
   const { data, error } = await supabase
     .from('expenses')
     .select('*')
