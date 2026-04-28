@@ -116,6 +116,74 @@ export async function setBudget(budget: Budget) {
   if (error) throw error;
 }
 
+// ─── Savings / Provisions ────────────────────────────────────────────────────
+
+export async function getSavingsMonthly(year: number, month: number): Promise<Record<string, number>> {
+  const { data, error } = await supabase
+    .from('savings_monthly')
+    .select('key, amount')
+    .eq('year', year)
+    .eq('month', month);
+  if (error) return {};
+  const result: Record<string, number> = {};
+  for (const row of data || []) {
+    result[row.key as string] = row.amount as number;
+  }
+  return result;
+}
+
+export async function upsertSavingsMonthly(
+  items: { key: string; amount: number }[],
+  year: number,
+  month: number
+) {
+  if (items.length === 0) return;
+  const rows = items.map((item) => ({ key: item.key, amount: item.amount, year, month }));
+  const { error } = await supabase
+    .from('savings_monthly')
+    .upsert(rows, { onConflict: 'key,month,year' });
+  if (error) throw error;
+}
+
+export async function getSavingsVoyage(): Promise<Record<string, { amount: number; received: boolean }>> {
+  const { data, error } = await supabase.from('savings_voyage').select('key, amount, received');
+  if (error) return {};
+  const result: Record<string, { amount: number; received: boolean }> = {};
+  for (const row of data || []) {
+    result[row.key as string] = { amount: row.amount as number, received: row.received as boolean };
+  }
+  return result;
+}
+
+export async function upsertSavingsVoyage(
+  items: { key: string; amount: number; received: boolean }[]
+) {
+  if (items.length === 0) return;
+  const { error } = await supabase
+    .from('savings_voyage')
+    .upsert(items, { onConflict: 'key' });
+  if (error) throw error;
+}
+
+export async function getSavingsSettings(): Promise<{ tripMonths: number; currentSavings: number }> {
+  const { data, error } = await supabase
+    .from('savings_settings')
+    .select('trip_months, current_savings')
+    .eq('id', 'singleton')
+    .single();
+  if (error || !data) return { tripMonths: 10, currentSavings: 0 };
+  return { tripMonths: data.trip_months as number, currentSavings: data.current_savings as number };
+}
+
+export async function upsertSavingsSettings(tripMonths: number, currentSavings: number) {
+  const { error } = await supabase
+    .from('savings_settings')
+    .upsert({ id: 'singleton', trip_months: tripMonths, current_savings: currentSavings }, { onConflict: 'id' });
+  if (error) throw error;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function getMonthlyTotals(
   months: number
 ): Promise<{ year: number; month: number; total: number }[]> {

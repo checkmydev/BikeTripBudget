@@ -8,6 +8,7 @@ const tabs = [
   { href: '/expenses/', label: 'Dépenses', emoji: '📋' },
   { href: '/reports/', label: 'Rapports', emoji: '📊' },
   { href: '/budget/', label: 'Budget', emoji: '💰' },
+  { href: '/epargne/', label: 'Épargne', emoji: '🏦' },
 ];
 
 export default function BottomNav() {
