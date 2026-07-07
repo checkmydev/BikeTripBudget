@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import BottomNav from '@/components/BottomNav';
+import InstallPrompt from '@/components/InstallPrompt';
+
+const basePath = process.env.NODE_ENV === 'production' ? '/BikeTripBudget' : '';
 
 export const metadata: Metadata = {
   title: 'Eve - Dépenses Vélo',
@@ -29,12 +32,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="format-detection" content="telephone=no" />
-        <link rel="apple-touch-icon" href="/icon-192.png" />
+        <link rel="apple-touch-icon" href={`${basePath}/icon-192.png`} />
       </head>
       <body className="bg-gray-50 min-h-screen">
         <div className="max-w-md mx-auto min-h-screen relative">
           <main className="pb-20">{children}</main>
           <BottomNav />
+          <InstallPrompt />
         </div>
       </body>
     </html>
